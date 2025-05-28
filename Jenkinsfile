@@ -1,20 +1,30 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven 3'  // Use exact Maven name from Jenkins Global Tool Config
+        jdk 'JDK 11'     // Use exact JDK name if configured
+    }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo "Building project with Maven"
-                // Windows users ke liye 'bat', Linux/Mac ke liye 'sh'
-                bat 'mvn clean package -DskipTests'
-                // agar Linux hai to: sh 'mvn clean package -DskipTests'
+                checkout scm
             }
         }
+
+        stage('Build') {
+            steps {
+                echo "Building the project using Maven"
+                bat 'mvn clean package -DskipTests'
+            }
+        }
+
         stage('Deploy') {
             steps {
-                echo "Deploying app"
+                echo "Running the Spring Boot application"
+                // Replace with your actual jar name inside target folder
                 bat 'java -jar target/Crud_Operation-0.0.1-SNAPSHOT.jar'
-                // Linux me: sh 'java -jar target/Crud_Operation-0.0.1-SNAPSHOT.jar'
             }
         }
     }
