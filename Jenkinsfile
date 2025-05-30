@@ -2,30 +2,38 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3'  // Use exact Maven name from Jenkins Global Tool Config
-        jdk 'JDK 17'     // Use exact JDK name if configured
+        jdk 'JDK 17'                // Name you set in Global Tool Config
+        maven 'Maven 3.8.1'         // Name you set in Global Tool Config
+    }
+
+    environment {
+        MAVEN_OPTS = '-Xmx1024m'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/gouravgoud/Crud_Operation' // Replace this with your actual repo
             }
         }
 
         stage('Build') {
             steps {
-                echo "Building the project using Maven"
-                bat 'mvn clean package -DskipTests'
+                bat 'mvn clean install'
             }
         }
 
-        stage('Deploy') {
+        stage('Run Application') {
             steps {
-                echo "Running the Spring Boot application"
-                // Replace with your actual jar name inside target folder
-                bat 'java -jar target/Crud_Operation-0.0.1-SNAPSHOT.jar'
+                bat 'start /b java -jar target\\Crud_Operation-0.0.1-SNAPSHOT.jar'
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up workspace...'
+            deleteDir()
         }
     }
 }
